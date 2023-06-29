@@ -1,4 +1,5 @@
 use bitvec::prelude::*;
+use itertools::{EitherOrBoth, Itertools};
 use std::{fmt::Display, io::Read};
 
 use rand::prelude::*;
@@ -17,11 +18,13 @@ pub enum IllegalMove {
     OutOfBounds,
     StackIsFull,
 }
+
 /// Describes possible outcomes for each play
 /// Either there is an illegal move, a valid play or the game has terminated
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GamePlay {
     ValidPlay,
+    InvalidBoard(IllegalMove),
     GameTerminated(TerminatedStatus),
 }
 
@@ -51,7 +54,7 @@ fn get_row(indx: u8) -> u64 {
 }
 
 // #[inline]
-// fn extract_mask(indx : u64) -> 
+// fn extract_mask(indx : u64) ->
 
 #[inline]
 fn get_main_diag(indx: i8) -> u64 {
@@ -128,7 +131,7 @@ impl Board {
         buffer
     }
 
-    fn from_rng(rng: &mut impl RngCore) -> Self {
+    pub(crate) fn from_rng(rng: &mut impl RngCore) -> Self {
         let mask: u64 = rng.gen();
         let mut numb: BitBoard = BitArray::ZERO;
         for i in 0..8 {
@@ -137,30 +140,6 @@ impl Board {
         let a = (numb & mask.view_bits::<Lsb0>());
         let b = numb ^ a;
         Self { red: a, yellow: b }
-    }
-
-    fn get_column(&self, col: u8) -> Option<(u8, u8)> {
-        if col > 7 {
-            None
-        } else {
-            unimplemented!("Implement column selection")
-        }
-    }
-
-    fn get_row(&self, col: u8) -> Option<(u8, u8)> {
-        if col > 7 {
-            None
-        } else {
-            unimplemented!("Unimplemented row selection")
-        }
-    }
-
-    fn get_diag(&self, col: u8) -> Option<DiagStruct> {
-        if col > 7 {
-            None
-        } else {
-            unimplemented!("Implement diag selection")
-        }
     }
 
     pub fn play(&mut self, player: Player, col: u8) -> Result<u8, IllegalMove> {
@@ -192,22 +171,47 @@ impl Board {
     }
 
     pub fn check_win(&self, row: u8, col: u8, player: Player) -> bool {
-        self.red.iter_ones
-        todo!()
+        let arr = match player {
+            Player::Red => &self.red,
+            Player::Yellow => &self.yellow,
+        };
+        let arr_mask = [
+            get_row(row),
+            get_col(col),
+            get_sec_diag((row + col) as i8 - 7),
+            get_main_diag(row as i8 - col as i8),
+        ];
+        arr_mask.into_iter().any(|mask| {
+            let mask = mask.view_bits::<Lsb0>();
+            let arr_masked = *arr & mask;
+            mask.iter_ones()
+                .enumerate()
+                .merge_join_by(arr_masked.iter_ones(), |(_indx, el1), el2| el1.cmp(el2))
+                .filter_map(|res| {
+                    println!("{res:?}");
+                    if let EitherOrBoth::Both((indx, _), _) = res {
+                        Some(indx)
+                    } else {
+                        None
+                    }
+                })
+                .collect_vec()
+                .windows(4)
+                .any(|el| {
+                    el.iter()
+                        .copied()
+                        .zip(el[1..].iter().copied())
+                        .all(|(a, b)| a + 1 == b)
+                })
+        })
     }
 }
 
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let buff = self.get_array();
-
         write!(f, "{}", print_array(&buff))
     }
-}
-
-pub enum BoardError {
-    IndexError,
-    FillError,
 }
 
 #[cfg(test)]
@@ -674,18 +678,60 @@ mod board_tests {
 
     mod validate_board {
         use super::*;
+
+        mod test_vertical {
+            use super::*;
+
+            #[test]
+            fn test_vertical_seed_122() {
+                let board = Board::from_rng(&mut StdRng::seed_from_u64(122));
+
+                for i in 3..=6 {
+                    assert!(board.check_win(i, 5, Player::Yellow));
+                    assert!(!board.check_win(i, 5, Player::Red));
+                }
+            }
+        }
+
+        mod test_diag {
+            use super::*;
+
+            #[test]
+            fn test_diag_seed_124() {
+                let board = Board::from_rng(&mut StdRng::seed_from_u64(124));
+                for (j, i) in [(6, 0), (4, 2), (3, 3)] {
+                    assert!(board.check_win(i, j, Player::Yellow), "for row {i} col {j}");
+                    assert!(!board.check_win(i, j, Player::Red));
+                }
+            }
+        }
+
+        mod test_horizontal {
+            use super::*;
+
+            #[test]
+            fn test_horizontal_seed_123() {
+                let board = Board::from_rng(&mut StdRng::seed_from_u64(123));
+                for i in 4..=7 {
+                    assert!(board.check_win(0, i, Player::Yellow));
+                    assert!(!board.check_win(0, i, Player::Red));
+                }
+            }
+        }
     }
 
     #[test]
     #[ignore = "Testing the interaction between bit representation and array representation"]
     fn test_array() {
-        let mut rng = StdRng::seed_from_u64(122);
-        let board = Board::from_rng(&mut rng);
+        for i in 20..50 {
+            let mut rng = StdRng::seed_from_u64(i);
+            let board = Board::from_rng(&mut rng);
+            println!("State:{i}\n{board}");
+        }
 
-        let mut arr = board.get_array();
+        // let mut arr = board.get_array();
 
-        arr[to_position(2, 3)] = Piece(Some(Player::Red));
-        println!("{board}");
-        println!("{}", print_array(&arr));
+        // arr[to_position(4, 2)] = Piece(Some(Player::Red));
+        // println!("{}", print_array(&arr));
     }
 }

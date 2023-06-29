@@ -1,12 +1,31 @@
+use std::default;
+
 use crate::{board::*, player::Player};
-pub struct GameState {
+pub struct GameState<T: GameTrait> {
     board: Board,
     current_player: Player,
-    terminated: bool,
+    state: T,
+    terminated: Option<TerminatedStatus>,
 }
 
-impl GameState {
-    pub fn new(board: Board) -> Self {
+#[derive(Default, Debug)]
+pub enum GameMode {
+    #[default]
+    PVP,
+    PVE,
+}
+
+struct Start(GameMode);
+struct Play;
+struct End;
+
+pub trait GameTrait {}
+impl GameTrait for Start {}
+impl GameTrait for Play {}
+impl GameTrait for End {}
+
+impl GameState<Start> {
+    fn new(board: Board) -> Self {
         Self {
             board,
             ..Default::default()
@@ -19,47 +38,77 @@ impl GameState {
 
     // Insert current chip at specific column and flip player
     // Player will only be flo
-    // pub fn play(&mut self, column: u8) -> GamePlay {
-    //     todo!()
-    // }
+    pub fn play(&mut self, column: u8) -> GamePlay {
+        todo!()
+    }
 }
 
-impl Default for GameState {
+impl Default for GameState<Start> {
     fn default() -> Self {
         Self {
             board: Board::default(),
             current_player: Player::Red,
-            terminated: false,
+            state: Start,
+            terminated: None,
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use itertools::Itertools;
-    use rand::RngCore;
 
     use super::*;
-    use crate::*;
-    use itertools::*;
+    use proptest::prelude::*;
     use rand::prelude::*;
 
     mod condition_tests {
         use super::*;
 
-        mod valid_moves {
-            use super::*;
+        // proptest! {
+        //     #[test]
+        //     fn test_on_empty_board(a in any::<u8>()) {
+        //         let mut game_state = GameState::default();
+        //         if a < 8 {
+        //             prop_assert_eq!(game_state.play(a), GamePlay::ValidPlay);
+        //             prop_assert_eq!(game_state.current_player, Player::Yellow);
+        //             prop_assert!(game_state.terminated.is_none());
+        //         } else {
+        //             prop_assert_eq!(game_state.play(a), GamePlay::InvalidBoard(IllegalMove::OutOfBounds));
+        //             prop_assert_eq!(game_state.current_player, Player::Red);
+        //             prop_assert!(game_state.terminated.is_none());
+        //         }
 
-            // #[test]
-            // fn test_empty_board_on_all_columns() {
-            //     for col in 0..7 {
-            //         let mut game_state = GameState::default();
-            //         assert_eq!(game_state.play(col), GamePlay::ValidPlay);
-            //     }
-            // }
+        //     }
+        // }
 
-            #[test]
-            fn test_on_random_positions() {}
-        }
+        // mod on_custom_boards_seed_42 {
+        //     use crate::game;
+
+        //     use super::*;
+        //     #[test]
+        //     fn test_on_col_1_player_red_should_be_valid() {
+        //         let mut game_state =
+        //             GameState::new(Board::from_rng(&mut StdRng::seed_from_u64(41)));
+
+        //         let game_result = game_state.play(1);
+        //         assert_eq!(game_result, GamePlay::ValidPlay);
+        //         assert_eq!(game_state.current_player, Player::Yellow);
+        //         assert!(game_state.terminated.is_none());
+        //     }
+
+        //     #[test]
+        //     fn test_on_col_6_player_red_should_be_win() {
+        //         let mut game_state =
+        //             GameState::new(Board::from_rng(&mut StdRng::seed_from_u64(41)));
+
+        //         let game_result = game_state.play(1);
+        //         assert_eq!(
+        //             game_result,
+        //             GamePlay::GameTerminated(TerminatedStatus::Win(Player::Red))
+        //         );
+        //         assert_eq!(game_state.current_player, Player::Yellow);
+        //         assert_eq!(game_state.terminated);
+        //     }
+        // }
     }
 }
