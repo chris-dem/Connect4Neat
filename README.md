@@ -32,6 +32,9 @@ How is it structured
    1. Overview: ![Train overview diagram](assets/overview_training.png)
    2. Train flow: ![Diagram](assets/flow.png)
 
+API interaction:
+![API interaction](assets/api_iteraction.png)
+
 ## Possible setbacks
 
 Dual training could confuse NEAT and lead to unwanted results. Careful inspection of the algorithm
