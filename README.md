@@ -28,6 +28,8 @@ How is it structured
        * Different modes of depth plus some random play for difficulty. Use Bernoulli distribution and the level of randomness
    * Game flow
 ![Game](assets/game_flow.PNG)
+2. Train mode
+   1. 
 
 ## References
 
