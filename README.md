@@ -29,7 +29,20 @@ How is it structured
    * Game flow
 ![Game](assets/game_flow.PNG)
 2. Train mode
-   1. 
+   1. Overview: ![Train overview diagram](assets/overview_training.png)
+   2. Train flow: ![Diagram](assets/flow.png)
+
+## Possible setbacks
+
+Dual training could confuse NEAT and lead to unwanted results. Careful inspection of the algorithm
+or trial and error might be needed.
+In case neat fails:
+
+1. Reduce networks to one (First attempt this)
+   1. Either by changing the fundamental algorithm
+   2. One network serves as a carrier for both
+      1. Neat will evolve both
+2. Change algorithm
 
 ## References
 

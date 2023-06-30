@@ -11,6 +11,7 @@ pub struct GameState<T: GameTrait> {
 #[derive(Default, Debug)]
 pub enum GameMode {
     #[default]
+    NotSet,
     PVP,
     PVE,
 }
@@ -48,7 +49,7 @@ impl Default for GameState<Start> {
         Self {
             board: Board::default(),
             current_player: Player::Red,
-            state: Start,
+            state: Start(GameMode::NotSet),
             terminated: None,
         }
     }
