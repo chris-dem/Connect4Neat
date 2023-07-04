@@ -11,6 +11,9 @@ const ROW_BASE: u64 = 72_340_172_838_076_673;
 const MAIN_DIAG_BASE: u64 = 9_241_421_688_590_303_745;
 const SEC_DIAG_BASE: u64 = 72_624_976_668_147_840;
 
+pub type Col = u8;
+pub type Row = u8;
+
 /// Illegal move possibilities
 /// Either move is out of bounds or the current column is full
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,18 +40,18 @@ pub enum TerminatedStatus {
 }
 
 #[inline]
-fn to_position(i: u8, j: u8) -> usize {
+fn to_position(i: Row, j: Col) -> usize {
     i as usize * WIDTH + j as usize
 }
 
 #[inline]
-fn get_col(indx: u8) -> u64 {
+fn get_col(indx: Col) -> u64 {
     assert!(indx < 8);
     COL_BASE << indx as u64 * 8
 }
 
 #[inline]
-fn get_row(indx: u8) -> u64 {
+fn get_row(indx: Col) -> u64 {
     assert!(indx < 8);
     ROW_BASE << indx as u64
 }
@@ -79,31 +82,31 @@ fn get_sec_diag(indx: i8) -> u64 {
         (SEC_DIAG_BASE << indx) & !shifted_inverse
     } else if indx < 0 {
         let indx = -indx as u64;
-        let shifted = ROW_BASE * ((1 << indx as u64) - 1 as u64) << (8 - indx as u8);
+        let shifted = ROW_BASE * ((1 << indx as u64) - 1 as u64) << (8 - indx as Col);
         SEC_DIAG_BASE >> indx as u64 & !shifted
     } else {
         SEC_DIAG_BASE
     }
 }
 
-type BitBoard = BitArr!(for 64, in u8, Lsb0);
+type BitBoard = BitArr!(for 64, in Col, Lsb0);
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Board {
     red: BitBoard,
     yellow: BitBoard,
 }
 
-struct DiagStruct {
-    main_diag: (u8, u8),
-    sec_diag: (u8, u8),
-}
+// struct DiagStruct {
+//     main_diag: (Col, Col),
+//     sec_diag: (Col, Col),
+// }
 
 fn print_array(arr: &[Piece]) -> String {
     let mut out_buffer = String::new();
-    for j in (0..HEIGHT as u8).rev() {
+    for j in (0..HEIGHT as Row).rev() {
         let mut buf = Vec::with_capacity(WIDTH);
-        for i in 0..WIDTH as u8 {
+        for i in 0..WIDTH as Col {
             buf.push(format!("{}", arr[to_position(i, j) as usize]));
         }
         out_buffer.push_str(format!("|{}|\n", buf.join("|")).as_str());
@@ -142,7 +145,7 @@ impl Board {
         Self { red: a, yellow: b }
     }
 
-    pub fn play(&mut self, player: Player, col: u8) -> Result<u8, IllegalMove> {
+    pub fn play(&mut self, player: Player, col: Col) -> Result<Row, IllegalMove> {
         if col > 7 {
             return Err(IllegalMove::OutOfBounds);
         }
@@ -167,10 +170,10 @@ impl Board {
         };
 
         arr.set(col as usize * 8 + indx, true);
-        Ok(indx as u8)
+        Ok(indx as Row)
     }
 
-    pub fn check_win(&self, row: u8, col: u8, player: Player) -> bool {
+    pub fn check_win(&self, row: Row, col: Col, player: Player) -> bool {
         let arr = match player {
             Player::Red => &self.red,
             Player::Yellow => &self.yellow,

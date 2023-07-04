@@ -1,0 +1,20 @@
+[package]
+name = "round_api"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "round_api"
+
+[dependencies]
+approx = "0.5.1"
+bitvec = "1.0.1"
+colored = "2.0.0"
+itertools = "0.10.5"
+mockall = "0.11.4"
+proptest = "1.2.0"
+rand = "0.8.5"
+rand_derive2 = "0.1.21"
+serde = "1.0.164"
