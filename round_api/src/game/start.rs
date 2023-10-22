@@ -1,16 +1,13 @@
-use crate::board::Board;
+use crate::{board::Board, player_agent::agent::PlayerTrait};
 
-use super::game::{GameTrait, RoundAPI};
+use super::{
+    game::{GameTrait, RoundAPI},
+    play::Play,
+    player_interaction::PlayerHandle,
+};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Start(pub(crate) Option<GameMode>);
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GameMode {
-    PVP,
-    PVE,
-    Training,
-}
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct Start(PlayerHandle);
 
 impl GameTrait for Start {}
 
@@ -18,7 +15,7 @@ impl Default for RoundAPI<Start> {
     fn default() -> Self {
         Self {
             board: Board::default(),
-            state: Start(None),
+            state: Start::default(),
         }
     }
 }
@@ -28,5 +25,24 @@ pub type RoundStart = RoundAPI<Start>;
 impl RoundStart {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn start_game(self) -> RoundAPI<Play> {
+        RoundAPI {
+            board: self.board,
+            state: Play::default(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_start_state() {
+        let game_start = RoundStart::new();
+        assert_eq!(game_start.state, Start::default());
+        assert_eq!(game_start.board, Board::default());
     }
 }

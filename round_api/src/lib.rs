@@ -3,7 +3,6 @@ pub const WIDTH: usize = 8;
 pub const HEIGHT: usize = 8;
 
 mod board;
-pub mod display;
 mod game;
 mod piece;
 mod player;

@@ -208,6 +208,23 @@ impl Board {
                 })
         })
     }
+
+    pub fn valid_moves(&self) -> [bool; 8] {
+        let mut ret = [false; 8];
+        for col in 0..8 {
+            let row_red = self.red[col as usize * 8..(col * 8 + 8) as usize].last_one();
+            let row_yellow = self.yellow[col as usize * 8..(col * 8 + 8) as usize].last_one();
+
+            let indx = match (row_red, row_yellow) {
+                (None, None) => 0,
+                (None, Some(e)) => e + 1,
+                (Some(e), None) => e + 1,
+                (Some(a), Some(b)) => a.max(b) + 1,
+            };
+            ret[col] = indx != 8;
+        }
+        ret
+    }
 }
 
 impl Display for Board {
@@ -731,10 +748,37 @@ mod board_tests {
             let board = Board::from_rng(&mut rng);
             println!("State:{i}\n{board}");
         }
+    }
 
-        // let mut arr = board.get_array();
+    mod check_valid_moves {
 
-        // arr[to_position(4, 2)] = Piece(Some(Player::Red));
-        // println!("{}", print_array(&arr));
+        use super::*;
+
+        #[test]
+        fn test_state_41() {
+            let board = Board::from_rng(&mut StdRng::seed_from_u64(41));
+            let arr = board.valid_moves();
+            let mut arr_valid = [true; 8];
+            arr_valid[2] = false;
+            arr_valid[6] = false;
+            arr_valid[7] = false;
+            assert_eq!(arr, arr_valid);
+        }
+
+        #[test]
+        fn test_state_43() {
+            let board = Board::from_rng(&mut StdRng::seed_from_u64(43));
+            let arr = board.valid_moves();
+            assert_eq!(arr, [true; 8]);
+        }
+
+        #[test]
+        fn test_state_44() {
+            let board = Board::from_rng(&mut StdRng::seed_from_u64(48));
+            let arr = board.valid_moves();
+            let mut arr_valid = [true; 8];
+            arr_valid[3] = false;
+            assert_eq!(arr, arr_valid);
+        }
     }
 }
