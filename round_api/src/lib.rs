@@ -7,18 +7,3 @@ mod game;
 mod piece;
 mod player;
 pub mod player_agent;
-
-// fn main() {
-//     let arr = (0..7).collect_vec();
-//     let arr2 = [1, 2, 3, 4, 5];
-//     let res = arr
-//         .iter()
-//         .copied()
-//         .merge_join_by(arr2.iter().copied(), usize::cmp)
-//         .filter_map(|sort_res| match sort_res {
-//             EitherOrBoth::Both(a, _) => Some(a),
-//             _ => None,
-//         })
-//         .collect_vec();
-//     println!("{res:?}");
-// }

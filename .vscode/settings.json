@@ -1,6 +1,7 @@
 {
     "rust-analyzer.linkedProjects": [
         ".\\round_api\\Cargo.toml",
-        ".\\round_api\\Cargo.toml"
+        ".\\round_api\\Cargo.toml",
+        ".\\game_api\\Cargo.toml"
     ]
 }

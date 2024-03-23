@@ -1,5 +1,6 @@
 [workspace]
-
+resolver = "2" # Important! wgpu/Bevy needs this!
 members = [
     "round_api",
+    "game_api"
 ]

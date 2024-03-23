@@ -1,6 +1,5 @@
 use std::fmt::Display;
 
-use crate::player;
 use crate::player::Player;
 
 #[macro_export]
@@ -8,9 +7,9 @@ macro_rules! piece {
     () => {
         Piece(None)
     };
-
+    
     ($r:ident) => {
-        Piece(Some(player!($r)))
+        Piece(Some(crate::player!($r)))
     };
 }
 
