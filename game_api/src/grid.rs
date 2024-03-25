@@ -60,8 +60,8 @@ impl Grid {
     }
 }
 
-#[derive(Component)]
-pub struct Tile {}
+#[derive(Clone, Copy, Component)]
+pub struct Tile(pub i32, pub i32);
 
 pub fn spawn_background(
     mut commands: Commands,
@@ -93,7 +93,7 @@ pub fn spawn_background(
                     ),
                     ..Default::default()
                 },
-                Tile {},
+                Tile(x, y)
             ));
         })
 }

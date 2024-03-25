@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 bevy = "0.13.1"
 itertools = "0.12.1"
+round_api = { path = "../round_api" }

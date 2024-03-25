@@ -1834,6 +1834,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "itertools 0.12.1",
+ "round_api",
 ]
 
 [[package]]

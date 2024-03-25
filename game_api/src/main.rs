@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 mod grid;
 mod mouse;
+mod game;
 
 fn main() {
     App::new()
