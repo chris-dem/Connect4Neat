@@ -35,7 +35,7 @@ pub enum GamePlay {
 /// Either a player had won or a draw occured
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TerminatedStatus {
-    Win(Player),
+   Win(Player),
     Draw,
 }
 
