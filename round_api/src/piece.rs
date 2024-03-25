@@ -9,7 +9,7 @@ macro_rules! piece {
     };
     
     ($r:ident) => {
-        Piece(Some(crate::player!($r)))
+        Piece(Some($crate::player!($r)))
     };
 }
 
