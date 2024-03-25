@@ -1,6 +1,6 @@
 use bitvec::prelude::*;
 use itertools::{EitherOrBoth, Itertools};
-use std::{fmt::Display, io::Read};
+use std::fmt::Display;
 
 use rand::prelude::*;
 
@@ -35,7 +35,7 @@ pub enum GamePlay {
 /// Either a player had won or a draw occured
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TerminatedStatus {
-   Win(Player),
+    Win(Player),
     Draw,
 }
 
@@ -47,7 +47,7 @@ fn to_position(i: Row, j: Col) -> usize {
 #[inline]
 fn get_col(indx: Col) -> u64 {
     assert!(indx < 8);
-    COL_BASE << indx as u64 * 8
+    COL_BASE << (indx as u64 * 8)
 }
 
 #[inline]
@@ -56,36 +56,38 @@ fn get_row(indx: Col) -> u64 {
     ROW_BASE << indx as u64
 }
 
-// #[inline]
-// fn extract_mask(indx : u64) ->
 
 #[inline]
 fn get_main_diag(indx: i8) -> u64 {
     assert!(indx.abs() < 8);
-    if indx > 0 {
-        let shifted_inverse = (ROW_BASE * ((1 << indx as u64) - 1)) << (8 - indx as u8);
-        (MAIN_DIAG_BASE >> indx) & !shifted_inverse
-    } else if indx < 0 {
-        let indx = -indx as u64;
-        let shifted = ROW_BASE * ((1 << indx as u64) - 1 as u64);
-        MAIN_DIAG_BASE << indx as u64 & !shifted
-    } else {
-        MAIN_DIAG_BASE
+    match indx.cmp(&0) {
+        std::cmp::Ordering::Greater => {
+            let shifted_inverse = (ROW_BASE * ((1 << indx as u64) - 1)) << (8 - indx as u8);
+            (MAIN_DIAG_BASE >> indx) & !shifted_inverse
+        }
+        std::cmp::Ordering::Equal => MAIN_DIAG_BASE,
+        std::cmp::Ordering::Less => {
+            let indx = -indx as u64;
+            let shifted = ROW_BASE * ((1 << indx) - 1_u64);
+            MAIN_DIAG_BASE << indx & !shifted
+        }
     }
 }
 
 #[inline]
 fn get_sec_diag(indx: i8) -> u64 {
     assert!(indx.abs() < 8);
-    if indx > 0 {
-        let shifted_inverse = ROW_BASE * ((1 << indx as u64) - 1);
-        (SEC_DIAG_BASE << indx) & !shifted_inverse
-    } else if indx < 0 {
-        let indx = -indx as u64;
-        let shifted = ROW_BASE * ((1 << indx as u64) - 1 as u64) << (8 - indx as Col);
-        SEC_DIAG_BASE >> indx as u64 & !shifted
-    } else {
-        SEC_DIAG_BASE
+    match indx.cmp(&0) {
+        std::cmp::Ordering::Greater => {
+            let shifted_inverse = ROW_BASE * ((1 << indx as u64) - 1);
+            (SEC_DIAG_BASE << indx) & !shifted_inverse
+        }
+        std::cmp::Ordering::Less => {
+            let indx = -indx as u64;
+            let shifted = (ROW_BASE * ((1_u64 << indx) - 1_u64)) << (8 - indx as Col);
+            SEC_DIAG_BASE >> indx & !shifted
+        }
+        std::cmp::Ordering::Equal => SEC_DIAG_BASE,
     }
 }
 
@@ -97,17 +99,12 @@ pub struct Board {
     yellow: BitBoard,
 }
 
-// struct DiagStruct {
-//     main_diag: (Col, Col),
-//     sec_diag: (Col, Col),
-// }
-
 fn print_array(arr: &[Piece]) -> String {
     let mut out_buffer = String::new();
     for j in (0..HEIGHT as Row).rev() {
         let mut buf = Vec::with_capacity(WIDTH);
         for i in 0..WIDTH as Col {
-            buf.push(format!("{}", arr[to_position(i, j) as usize]));
+            buf.push(format!("{}", arr[to_position(i, j)]));
         }
         out_buffer.push_str(format!("|{}|\n", buf.join("|")).as_str());
     }
@@ -134,13 +131,13 @@ impl Board {
         buffer
     }
 
-    pub(crate) fn from_rng(rng: &mut impl RngCore) -> Self {
+    pub fn from_rng(rng: &mut impl RngCore) -> Self {
         let mask: u64 = rng.gen();
         let mut numb: BitBoard = BitArray::ZERO;
         for i in 0..8 {
             numb[i * 8..(i * 8 + rng.gen_range(0..=8usize))].fill(true);
         }
-        let a = (numb & mask.view_bits::<Lsb0>());
+        let a = numb & mask.view_bits::<Lsb0>();
         let b = numb ^ a;
         Self { red: a, yellow: b }
     }
@@ -237,7 +234,7 @@ impl Display for Board {
 #[cfg(test)]
 mod board_tests {
     use crate::{
-        board::{print_array, to_position, Board},
+        board::{to_position, Board},
         piece::Piece,
         player::Player,
     };

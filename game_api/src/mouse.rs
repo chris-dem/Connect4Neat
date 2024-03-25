@@ -16,9 +16,9 @@ impl Plugin for MousePlugin {
 
 fn draw_cursor(
     camera_query: Query<(&Camera, &GlobalTransform)>,
-    queries : Query<
     windows: Query<&Window>,
-    board: Res<Board>,
+    mut gizmos: Gizmos,
+    board : Res<Board>,
 ) {
     let (camera, camera_transform) = camera_query.single();
 
@@ -31,5 +31,10 @@ fn draw_cursor(
         return;
     };
 
-    let (i,j) = board.get_indexes(point);
+    let (i,j) = board.get_indexes((point.x, point.y));
+    let point = board.get_translation(i, j);
+
+    let (i,j) = board.gap_size();
+
+    gizmos.circle_2d(point.into(),i.min(j) / 2., Color::WHITE);
 }
