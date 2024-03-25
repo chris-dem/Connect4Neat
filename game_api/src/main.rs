@@ -1,12 +1,12 @@
 use bevy::prelude::*;
 
-mod game;
+mod grid;
 mod mouse;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugins(game::BoardPlugin)
+        .add_plugins(grid::GridPlugin)
         .add_plugins(mouse::MousePlugin)
         .run();
 }

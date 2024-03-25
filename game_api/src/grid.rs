@@ -5,18 +5,18 @@ use bevy::{
 };
 use itertools::Itertools;
 
-pub struct BoardPlugin;
+pub struct GridPlugin;
 
-impl Plugin for BoardPlugin {
+impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<Board>()
+        app.init_resource::<Grid>()
             .add_systems(Startup, (initialize_grid, setup_camera))
             .add_systems(Startup, spawn_background.after(initialize_grid));
     }
 }
 
 #[derive(Resource, Default)]
-pub struct Board {
+pub struct Grid {
     win_size: (f32, f32),
     gap_size: (f32, f32),
     board_size: (i32, i32),
@@ -28,13 +28,13 @@ pub fn initialize_grid(window_query: Query<&Window, With<PrimaryWindow>>, mut co
     let window = window_query.get_single().unwrap();
     let window_size = (window.width(), window.height());
 
-    commands.insert_resource(Board::new(window_size));
+    commands.insert_resource(Grid::new(window_size));
 }
 
-impl Board {
+impl Grid {
     // Create a new TranslationGrid instance
     pub fn new((wx, wy): (f32, f32)) -> Self {
-        Board {
+        Grid {
             win_size: (wx, wy),
             board_size: (BOARDSIZE, BOARDSIZE),
             gap_size: (wx / BOARDSIZE as f32, wy / BOARDSIZE as f32),
@@ -67,7 +67,7 @@ pub fn spawn_background(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    board: Res<Board>,
+    board: Res<Grid>,
 ) {
     let mat1 = materials.add(Color::rgb(172. / 255., 206. / 255., 94. / 255.));
     let mat2 = materials.add(Color::rgb(114. / 255., 183. / 255., 106. / 255.));

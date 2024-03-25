@@ -1,4 +1,4 @@
-use crate::{board::Board, player_agent::agent::PlayerTrait};
+use crate::board::Board;
 
 use super::{
     game::{GameTrait, RoundAPI},
@@ -7,7 +7,7 @@ use super::{
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub struct Start(PlayerHandle);
+pub struct Start;
 
 impl GameTrait for Start {}
 

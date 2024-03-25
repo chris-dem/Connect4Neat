@@ -1,6 +1,6 @@
-use bevy::{log, prelude::*, sprite::{MaterialMesh2dBundle, Mesh2dHandle}, window::PrimaryWindow};
+use bevy::prelude::*;
 
-use crate::game::{Board, MainCamera};
+use crate::grid::Grid;
 
 pub struct MousePlugin;
 
@@ -18,7 +18,7 @@ fn draw_cursor(
     camera_query: Query<(&Camera, &GlobalTransform)>,
     windows: Query<&Window>,
     mut gizmos: Gizmos,
-    board : Res<Board>,
+    board : Res<Grid>,
 ) {
     let (camera, camera_transform) = camera_query.single();
 
