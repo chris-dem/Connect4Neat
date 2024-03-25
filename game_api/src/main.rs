@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 mod grid;
+mod plugins;
 mod mouse;
 mod game;
 

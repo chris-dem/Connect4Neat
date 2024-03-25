@@ -3,7 +3,6 @@ use crate::board::Board;
 use super::{
     game::{GameTrait, RoundAPI},
     play::Play,
-    player_interaction::PlayerHandle,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]

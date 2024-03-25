@@ -7,14 +7,6 @@ use itertools::Itertools;
 
 pub struct GridPlugin;
 
-impl Plugin for GridPlugin {
-    fn build(&self, app: &mut App) {
-        app.init_resource::<Grid>()
-            .add_systems(Startup, (initialize_grid, setup_camera))
-            .add_systems(Startup, spawn_background.after(initialize_grid));
-    }
-}
-
 #[derive(Resource, Default)]
 pub struct Grid {
     win_size: (f32, f32),
